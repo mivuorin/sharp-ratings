@@ -13,8 +13,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="client\node_modules\**" />
+    <Content Include="client\src\main.js" />
+    <Content Include="client\src\App.svelte" />
+    <Content Include="client\rollup.config.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.2" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.2" />
   </ItemGroup>
+
+  <Target Name="Rollup" BeforeTargets="Build">
+    <Exec Command="npm run build" WorkingDirectory="client" ConsoleToMSBuild="true" />
+  </Target>
 
 </Project>
