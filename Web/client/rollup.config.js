@@ -13,7 +13,7 @@ export default {
             include: 'src/**/*.svelte',
             emitCss: false,
             compilerOptions: {
-                customElement: true
+                customElement: false
             }
         }),
         resolve({browser: true})

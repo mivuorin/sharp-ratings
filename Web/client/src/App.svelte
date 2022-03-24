@@ -1,5 +1,4 @@
-﻿<svelte:options tag="svelte-app" />
-<script>
+﻿<script>
   export let name;
 </script>
 
