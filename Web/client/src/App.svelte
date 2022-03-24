@@ -1,13 +1,7 @@
 ﻿<script>
-  export let name;
+  import Hello from "./Hello.svelte";
 </script>
 
 <main>
-  <h1>Hello {name} from Svelte!</h1>
+  <Hello name="Mikko" />
 </main>
-
-<style>
-  h1 {
-      font-size: 2em;
-  }
-</style>

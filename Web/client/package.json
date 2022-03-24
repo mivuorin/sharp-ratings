@@ -5,14 +5,41 @@
   "main": "index.js",
   "scripts": {
     "dev": "rollup -c -w",
-    "build": "rollup -c rollup.config.js"
+    "build": "rollup -c rollup.config.js",
+    "test": "jest"
   },
   "author": "Mikko Vuorinen",
   "license": "MIT",
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.1.3",
+    "@testing-library/jest-dom": "^5.16.2",
+    "@testing-library/svelte": "^3.1.0",
+    "jest": "^27.5.1",
     "rollup": "^2.70.0",
+    "rollup-jest": "^1.1.3",
     "rollup-plugin-svelte": "^7.1.0",
-    "svelte": "^3.46.4"
+    "svelte": "^3.46.4",
+    "svelte-jester": "^2.3.2"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.svelte$": "svelte-jester",
+      "\\.m?js$": [
+        "rollup-jest",
+        {
+          "output": {
+            "sourcemap": true
+          }
+        }
+      ]
+    },
+    "moduleFileExtensions": [
+      "js",
+      "svelte"
+    ],
+    "setupFilesAfterEnv": [
+      "@testing-library/jest-dom/extend-expect"
+    ],
+    "testEnvironment": "jsdom"
   }
 }
