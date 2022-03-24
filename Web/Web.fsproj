@@ -4,19 +4,19 @@
     <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>SharpRatings.Web</AssemblyName>
     <RootNamespace>SharpRatings.Web</RootNamespace>
+    
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Label="Server">
     <Compile Include="Controllers\HelloController.fs" />
     <Compile Include="Controllers\HomeController.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Label="Client">
+    <Content Include="client\**\*.js" />
+    <Content Include="client\**\*.svelte" />
     <Content Remove="client\node_modules\**" />
-    <Content Include="client\src\main.js" />
-    <Content Include="client\src\App.svelte" />
-    <Content Include="client\rollup.config.js" />
   </ItemGroup>
 
   <ItemGroup>
