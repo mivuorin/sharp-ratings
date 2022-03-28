@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup Label="Server">
-    <Compile Include="Controllers\HelloController.fs" />
+    <Compile Include="Controllers\RatingsController.fs" />
     <Compile Include="Controllers\HomeController.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

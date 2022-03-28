@@ -8,8 +8,8 @@ Learning project for Svelte and Asp.Net Core powered by F#.
 
 ## How to build:
 
-Svelte client needs to be built before building asp.net app. All client code is in 'client' folder and bulid result will
-be located in 'wwwroot' folder where asp.net is serving it. To manually build client:
+Svelte client needs to be built before building asp.net app. All client code is in `client` folder and bulid result will
+be located in `wwwroot` folder where asp.net is serving it. To manually build client:
 
     cd client
     npm install
@@ -20,7 +20,7 @@ Building client is automatically done in MsBuilds before build target.
 ## How to dev:
 
 Asp.net pages are compiled at runtime so no need to restart server. Svelte supports hot reloading in watch mode which
-can be enabled by running 'dev' npm script.
+can be enabled by running `dev` npm script.
 
     client/npm run dev
 
@@ -31,17 +31,17 @@ not supported for F# so code scaffolding does not work.
 
 ## Testing with Jest
 
-Jest test can be run 'rollup-jest' rollup plugin.
+Jest test can be run `rollup-jest` rollup plugin.
 
     npm install --save-dev jest rollup-jest
 
-Using preset configuration for jest in 'package.json'
+Using preset configuration for jest in `package.json`
 
     "jest": {
       "preset": "rollup-jest"
     }
 
-Svelte components needs to be precompiled for jest tests with 'svelte-jester' jest plugin
+Svelte components needs to be precompiled for jest tests with `svelte-jester` jest plugin
 
     npm install --save-dev svelte-jester
 
@@ -54,7 +54,7 @@ Configure jest to preprocess svelte components
       "moduleFileExtensions": ["js", "svelte"]
     }
 
-Svelte components can be tested with 'testing-library' svelte extension
+Svelte components can be tested with `testing-library` svelte extension
 
     npm install --save-dev @testing-library/svelte
 
@@ -68,7 +68,42 @@ Configure jest to use dom matchers
       "@testing-library/jest-dom/extend-expect"
     ]
 
-    
+## Mocking fetch
+
+Use [jest-fetch-mock](https://github.com/jefflau/jest-fetch-mock) to automatically mock fetch function. 
+
+    npm install --save-dev jest-fetch-mock
+
+By default `jest-fetch-mock` enables mocks which needs to be reset after each test. Currently `jest-fetch-mocks` readme advices to disable automatic mock reset from jest and explicitly reset mocks after each tests run.
+This can lead problems when mocks share state across tests, when resetting mocks has been forgotten from individual test and also extra code.
+
+It's better to make jest reset mocks after each test.
+
+Fetch mock needs to be initialized before loading jest environment, in `jest.setup.js`
+
+    import fetchMock from "jest-fetch-mock";
+    fetchMock.enableMocks();
+
+To allow `jest-fetch-mock` to work with automatic mock resetting, it needs to be enabled before each test. This can be done in jest after env setup file: `jest.setupAfterEnv.js`
+
+    import fetchMock from "jest-fetch-mock";
+
+    beforeEach(() => {
+      fetchMock.doMock()
+    })
+
+And configure jest to use global setup file
+
+    "jest": {
+        "automock": false,
+        "resetMocks": true,
+        "setupFiles": [
+          "./jest.setup.js"
+        ],
+        "setupFilesAfterEnv": [
+          "./jest.setupAfterEnv.js",
+        ]
+    }
 
 # Reference links
 
@@ -80,3 +115,11 @@ Configure jest to use dom matchers
 * Svelte Testing Library - https://testing-library.com/docs/svelte-testing-library/intro/
 * Jest DOM matchers for Testing Library - https://github.com/testing-library/jest-dom
 * Svelte preprocessor for using other languages than JS - https://github.com/sveltejs/svelte-preprocess
+
+# TODO List
+
+* Move building client out from asp.net web project build to speed up building. No need to build client when building backend for tests.
+* Add prettier & linter
+* Move jest configuration to separate config file from packages.config to make things cleaner
+* Figure out why Rider shows solution view shows multiple duplicate folders eg. client and src.
+* Use generators for generating test data
