@@ -123,3 +123,5 @@ And configure jest to use global setup file
 * Move jest configuration to separate config file from packages.config to make things cleaner
 * Figure out why Rider shows solution view shows multiple duplicate folders eg. client and src.
 * Use generators for generating test data
+* Wrap dbcontext into repository which would offer more functional api, so that method calls would not be needed to ignore
+* Make web api asynchronous https://docs.microsoft.com/en-us/aspnet/core/web-api/action-return-types?view=aspnetcore-6.0

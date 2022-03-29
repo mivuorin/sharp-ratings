@@ -5,6 +5,9 @@ open Microsoft.Extensions.Hosting
 
 open Microsoft.Extensions.DependencyInjection
 
+open Microsoft.EntityFrameworkCore
+open SharpRatings.Web.Database
+
 module Program =
     let exitCode = 0
 
@@ -14,6 +17,9 @@ module Program =
 
         builder
             .Services
+            .AddDbContext<SharpRatingsDataContext>(fun builder ->
+                builder.UseInMemoryDatabase("SharpRatings")
+                |> ignore)
             .AddControllersWithViews()
             .AddRazorRuntimeCompilation()
         |> ignore
@@ -36,5 +42,5 @@ module Program =
         |> ignore
 
         app.Run()
-        
+
         exitCode

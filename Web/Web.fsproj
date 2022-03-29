@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup Label="Server">
+    <Compile Include="Rating.fs" />
+    <Compile Include="Database.fs" />
     <Compile Include="Controllers\RatingsController.fs" />
     <Compile Include="Controllers\HomeController.fs" />
     <Compile Include="Program.fs" />
@@ -21,6 +23,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.3" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.2" />
   </ItemGroup>
 
