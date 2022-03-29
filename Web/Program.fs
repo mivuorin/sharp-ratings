@@ -41,6 +41,19 @@ module Program =
                 endpoints.MapControllers() |> ignore)
         |> ignore
 
+        use scope = app.Services.CreateScope()
+
+        use context =
+            scope.ServiceProvider.GetRequiredService<SharpRatingsDataContext>()
+
+        context.Add(Rating.create "Svelte" "Svelte is nice component framework.")
+        |> ignore
+
+        context.Add(Rating.create "F#" "F# is great functional language.")
+        |> ignore
+
+        context.SaveChanges() |> ignore
+
         app.Run()
 
         exitCode
