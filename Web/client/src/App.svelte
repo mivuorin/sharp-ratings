@@ -1,7 +1,7 @@
 ﻿<script>
-  import Hello from "./Hello.svelte";
+  import Ratings from "./Ratings.svelte"
 </script>
 
 <main>
-  <Hello name="Mikko" />
+  <Ratings />
 </main>
