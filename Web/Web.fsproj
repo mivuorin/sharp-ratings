@@ -10,6 +10,7 @@
   <ItemGroup Label="Server">
     <Compile Include="Rating.fs" />
     <Compile Include="Database.fs" />
+    <Compile Include="Repository.fs" />
     <Compile Include="Controllers\RatingsController.fs" />
     <Compile Include="Controllers\HomeController.fs" />
     <Compile Include="Program.fs" />

@@ -105,6 +105,13 @@ And configure jest to use global setup file
         ]
     }
 
+## Testing library user events
+
+When testing user interaction with form components, there is much more happening than just firing simple click events.
+Using 'user-event' library makes firing user interaction events simpler.
+ 
+    npm install --save-dev @testing-library/user-event
+
 # Reference links
 
 * Svelte docs - https://svelte.dev/docs
@@ -125,3 +132,4 @@ And configure jest to use global setup file
 * Use generators for generating test data
 * Wrap dbcontext into repository which would offer more functional api, so that method calls would not be needed to ignore
 * Make web api asynchronous https://docs.microsoft.com/en-us/aspnet/core/web-api/action-return-types?view=aspnetcore-6.0
+* Switch NUnit to XUnit which has better support for async tests https://github.com/xunit/xunit/issues/955
