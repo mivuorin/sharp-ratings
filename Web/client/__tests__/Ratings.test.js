@@ -3,26 +3,6 @@ import {render, screen} from '@testing-library/svelte'
 import Ratings from "../src/Ratings.svelte";
 import {defer} from "./defer";
 
-function rating(title, body) {
-    return {title: title, body: body};
-}
-
-function findRatingByTitle(first) {
-    return screen.findByRole('heading', {name: first.title});
-}
-
-function findRatingByBody(first) {
-    return screen.findByText(first.body);
-}
-
-function findNoRatings() {
-    return screen.findByText('No ratings found :(');
-}
-
-function findLoadingIndicator() {
-    return screen.findByText('Loading...');
-}
-
 describe('Ratings component', () => {
 
     let resolve;
@@ -92,3 +72,23 @@ describe('Ratings component', () => {
         expect(await screen.findByText('Loading error!!!')).toBeInTheDocument()
     });
 })
+
+function rating(title, body) {
+    return {title: title, body: body};
+}
+
+function findRatingByTitle(first) {
+    return screen.findByRole('heading', {name: first.title});
+}
+
+function findRatingByBody(first) {
+    return screen.findByText(first.body);
+}
+
+function findNoRatings() {
+    return screen.findByText('No ratings found :(');
+}
+
+function findLoadingIndicator() {
+    return screen.findByText('Loading...');
+}
