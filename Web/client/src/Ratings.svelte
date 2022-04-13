@@ -1,17 +1,18 @@
 ﻿<script>
-    async function getRatings() {
-        const response = await fetch('/api/ratings')
-        
-        if(response.ok) {
-            return await response.json()
-        }
-        
-        throw new Error()
+  async function getRatings() {
+    const response = await fetch('/api/ratings');
+
+    if (response.ok) {
+      return await response.json();
     }
+
+    throw new Error();
+  }
 </script>
+
 <h1>Best rated tech!</h1>
 
-{#await getRatings() }
+{#await getRatings()}
   <div>Loading...</div>
 {:then ratings}
   <div role="list">

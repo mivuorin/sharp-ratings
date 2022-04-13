@@ -8,7 +8,7 @@ Learning project for Svelte and Asp.Net Core powered by F#.
 
 ## How to build:
 
-Svelte client needs to be built before building asp.net app. All client code is in `client` folder and bulid result will
+Svelte client needs to be built before building asp.net app. All client code is in `client` folder and build result will
 be located in `wwwroot` folder where asp.net is serving it. To manually build client:
 
     cd client
@@ -37,9 +37,13 @@ Jest test can be run `rollup-jest` rollup plugin.
 
 Using preset configuration for jest in `package.json`
 
-    "jest": {
-      "preset": "rollup-jest"
-    }
+```json
+{
+  "jest": {
+    "preset": "rollup-jest"
+  }
+}
+```
 
 Svelte components needs to be precompiled for jest tests with `svelte-jester` jest plugin
 
@@ -47,12 +51,19 @@ Svelte components needs to be precompiled for jest tests with `svelte-jester` je
 
 Configure jest to preprocess svelte components
 
-    "jest": {
-      "transform": {
-        "^.+\\.svelte$": "svelte-jester"
-      },
-      "moduleFileExtensions": ["js", "svelte"]
-    }
+```json
+{
+  "jest": {
+    "transform": {
+      "^.+\\.svelte$": "svelte-jester"
+    },
+    "moduleFileExtensions": [
+      "js",
+      "svelte"
+    ]
+  }
+}
+```
 
 Svelte components can be tested with `testing-library` svelte extension
 
@@ -64,27 +75,37 @@ Also add Jest DOM matchers which help in writing clean tests
 
 Configure jest to use dom matchers
 
-    "setupFilesAfterEnv": [
-      "@testing-library/jest-dom/extend-expect"
-    ]
+```json
+{
+  "setupFilesAfterEnv": [
+    "@testing-library/jest-dom/extend-expect"
+  ]
+}
+```
 
 ## Mocking fetch
 
-Use [jest-fetch-mock](https://github.com/jefflau/jest-fetch-mock) to automatically mock fetch function. 
+Use [jest-fetch-mock](https://github.com/jefflau/jest-fetch-mock) to automatically mock fetch function.
 
     npm install --save-dev jest-fetch-mock
 
-By default `jest-fetch-mock` enables mocks which needs to be reset after each test. Currently `jest-fetch-mocks` readme advices to disable automatic mock reset from jest and explicitly reset mocks after each tests run.
-This can lead problems when mocks share state across tests, when resetting mocks has been forgotten from individual test and also extra code.
+By default `jest-fetch-mock` enables mocks which needs to be reset after each test. Currently `jest-fetch-mocks` readme
+advices to disable automatic mock reset from jest and explicitly reset mocks after each tests run. This can lead
+problems when mocks share state across tests, when resetting mocks has been forgotten from individual test and also
+extra code.
 
 It's better to make jest reset mocks after each test.
 
 Fetch mock needs to be initialized before loading jest environment, in `jest.setup.js`
 
+```js
     import fetchMock from "jest-fetch-mock";
-    fetchMock.enableMocks();
 
-To allow `jest-fetch-mock` to work with automatic mock resetting, it needs to be enabled before each test. This can be done in jest after env setup file: `jest.setupAfterEnv.js`
+fetchMock.enableMocks();
+```
+
+To allow `jest-fetch-mock` to work with automatic mock resetting, it needs to be enabled before each test. This can be
+done in jest after env setup file: `jest.setupAfterEnv.js`
 
     import fetchMock from "jest-fetch-mock";
 
@@ -94,23 +115,186 @@ To allow `jest-fetch-mock` to work with automatic mock resetting, it needs to be
 
 And configure jest to use global setup file
 
-    "jest": {
-        "automock": false,
-        "resetMocks": true,
-        "setupFiles": [
-          "./jest.setup.js"
-        ],
-        "setupFilesAfterEnv": [
-          "./jest.setupAfterEnv.js",
-        ]
-    }
+```json
+{
+  "jest": {
+    "automock": false,
+    "resetMocks": true,
+    "setupFiles": [
+      "./jest.setup.js"
+    ],
+    "setupFilesAfterEnv": [
+      "./jest.setupAfterEnv.js"
+    ]
+  }
+}
+```
 
 ## Testing library user events
 
 When testing user interaction with form components, there is much more happening than just firing simple click events.
 Using 'user-event' library makes firing user interaction events simpler.
- 
+
     npm install --save-dev @testing-library/user-event
+
+## ESLint & Prettier
+
+For static code analysis install ESLint and Prettier for formatting. Configure ESLint to fail if code is not formatted
+correctly with prettier.
+
+    npm install --save-dev prettier eslint eslint-config-prettier eslint-plugin-prettier
+
+Create ESLint configuration file according to your project. Styles can be ignored because we are using prettier for
+that.
+
+```json
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": "prettier",
+  "plugins": [
+    "eslint:recommended",
+    "prettier"
+  ],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "rules": {
+    "prettier/prettier": [
+      "error"
+    ]
+  }
+}    
+```
+
+Running eslint:
+
+    npx eslint .
+
+Running prettier:
+
+    npx prettier -c .
+
+Automatically formatting code with prettier:
+
+    npx prettier -fix .
+
+### Prettier on Windows
+
+Prettier forced LF line endings in 2.0 version, which will cause problems if running with git `core.autocrlf=true`
+setting on Windows OS. Every time checking out code git will convert LF to CRLF and fail linter and forcing line endings
+to LF can cause other problems in Windows, so best to allow them locally. Make sure you still commit LF line endings!
+
+We also prefer single quote string literals in js, personal opinion. Create following Prettier configuration
+file `.prettierrc.json`
+
+```json
+{
+  "endOfLine": "auto",
+  "singleQuote": true
+}
+```
+
+### ESLint: Jest
+
+For linting test files add `eslint-plugin-jest` plugin.
+
+    npm install --save-dev eslint-plugin-jest
+
+Configure recommended rules or all rules.
+
+```json
+{
+  "extends": [
+    "plugin:jest/recommended"
+  ],
+  "plugins": [
+    "jest"
+  ]
+}
+```
+
+### ESLint: testing library rules
+
+Add following plugins to enforce good testing library use.
+
+    npm install -D eslint-plugin-testing-library eslint-plugin-jest-dom
+
+Configure ESLint:
+
+```json
+{
+  "extends": [
+    "plugin:testing-library/dom"
+  ],
+  "plugins": [
+    "testing-library",
+    "jest-dom"
+  ]
+}
+``` 
+
+### ESLint: Svelte
+
+Add following plugin for linting Svelte components.
+
+    npm install --save-dev eslint-plugin-svelte3
+
+Configure ESLint Svelte plugin and add processing override for Svelte component files.
+
+```json
+{
+  "plugins": [
+    "svelte3"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "**/*.svelte"
+      ],
+      "processor": "svelte3/svelte3"
+    }
+  ]
+}
+```
+
+Include Svelte component file extension when running linter.
+
+    eslint . --ext .js,.svelte
+
+> :warning: **`prettier-plugin-svelte` does not work with `eslint-prettier-plugin`**!!!
+> It is better to keep ESLint separated from prettier and use `npx prettier . -c` command to check if there is formatting errors.
+
+### Prettier: Svelte
+
+Add following plugin to Prettier for formatting Svelte components.
+
+    npm install --save-dev prettier-plugin-svelte
+
+Configure file override for Svelte components.
+
+```json
+{
+  "plugins": [
+    "svelte3"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "*.svelte"
+      ],
+      "processor": "svelte3/svelte3"
+    }
+  ]
+}
+```
+
+Add .svelte component extension when running ESLint.
+
+    eslint . --ext .js,.svelte
 
 # Reference links
 
@@ -125,11 +309,12 @@ Using 'user-event' library makes firing user interaction events simpler.
 
 # TODO List
 
-* Move building client out from asp.net web project build to speed up building. No need to build client when building backend for tests.
-* Add prettier & linter
+* Move building client out from asp.net web project build to speed up building. No need to build client when building
+  backend for tests.
 * Move jest configuration to separate config file from packages.config to make things cleaner
 * Figure out why Rider shows solution view shows multiple duplicate folders eg. client and src.
 * Use generators for generating test data
-* Wrap dbcontext into repository which would offer more functional api, so that method calls would not be needed to ignore
+* Wrap dbcontext into repository which would offer more functional api, so that method calls would not be needed to
+  ignore
 * Make web api asynchronous https://docs.microsoft.com/en-us/aspnet/core/web-api/action-return-types?view=aspnetcore-6.0
 * Switch NUnit to XUnit which has better support for async tests https://github.com/xunit/xunit/issues/955

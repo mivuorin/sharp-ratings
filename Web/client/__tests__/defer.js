@@ -1,11 +1,11 @@
 ﻿export function defer() {
-    let _resolve;
-    let _reject;
+  let _resolve;
+  let _reject;
 
-    const promise = new Promise((resolve, reject) => {
-        _resolve = resolve;
-        _reject = reject
-    })
+  const promise = new Promise((resolve, reject) => {
+    _resolve = resolve;
+    _reject = reject;
+  });
 
-    return {promise, resolve: _resolve, reject: _reject};
+  return { promise, resolve: _resolve, reject: _reject };
 }
