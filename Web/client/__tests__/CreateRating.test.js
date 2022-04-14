@@ -1,9 +1,17 @@
-﻿import { render, screen } from '@testing-library/svelte';
-import CreateRating from '../src/CreateRating.svelte';
+﻿import * as api from '../src/Api';
+import { render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
+
+import CreateRating from '../src/CreateRating.svelte';
+
+jest.mock('../src/Api');
 
 describe('Create rating', () => {
   it('post rating to api on submit', async () => {
+    const postRatingMock = jest
+      .spyOn(api, 'postRating')
+      .mockImplementation(() => Promise.resolve());
+
     userEvent.setup();
 
     render(CreateRating);
@@ -17,16 +25,12 @@ describe('Create rating', () => {
     const submit = await screen.findByRole('button');
     await userEvent.click(submit);
 
-    // TODO encapsulate fetch logic in separate function to make testing easier
-    let expected = {
+    const expected = {
       title: 'test-title',
       body: 'test-body',
     };
 
-    expect(fetch).toHaveBeenCalledWith(
-      '/api/ratings',
-      toJsonPostRequest(expected)
-    );
+    expect(postRatingMock).toHaveBeenCalledWith(expected);
   });
 });
 
@@ -36,14 +40,4 @@ function findTitle() {
 
 function findBody() {
   return screen.findByLabelText(/^Review about/);
-}
-
-function toJsonPostRequest(expected) {
-  return {
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(expected),
-  };
 }
