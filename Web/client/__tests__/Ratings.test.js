@@ -1,7 +1,7 @@
 ﻿import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/svelte';
 import Ratings from '../src/Ratings.svelte';
-import { defer } from './defer';
+import { defer } from '../test/defer';
 
 import * as api from '../src/Api';
 
