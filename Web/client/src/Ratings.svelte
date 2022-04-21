@@ -1,13 +1,5 @@
 ﻿<script>
-  async function getRatings() {
-    const response = await fetch('/api/ratings');
-
-    if (response.ok) {
-      return await response.json();
-    }
-
-    throw new Error();
-  }
+  import { getRatings } from './Api';
 </script>
 
 <h1>Best rated tech!</h1>

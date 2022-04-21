@@ -2,15 +2,22 @@
 import { render, screen } from '@testing-library/svelte';
 import Ratings from '../src/Ratings.svelte';
 import { defer } from './defer';
-import fetchMock from 'jest-fetch-mock';
+
+import * as api from '../src/Api';
+
+jest.mock('../src/Api');
 
 describe('Ratings component', () => {
   let resolve;
   let reject;
+  let getRatingsMock;
 
   beforeEach(() => {
     const deferred = defer();
-    fetchMock.mockResponseOnce(() => deferred.promise);
+
+    getRatingsMock = jest
+      .spyOn(api, 'getRatings')
+      .mockImplementationOnce(() => deferred.promise);
 
     resolve = deferred.resolve;
     reject = deferred.reject;
@@ -26,7 +33,7 @@ describe('Ratings component', () => {
   it('fetch ratings from api', async () => {
     render(Ratings);
 
-    expect(fetch).toHaveBeenCalledWith('/api/ratings');
+    expect(getRatingsMock).toHaveBeenCalled();
   });
 
   it('show ratings', async () => {
@@ -35,7 +42,7 @@ describe('Ratings component', () => {
     const first = rating('first-title', 'first-body');
     const second = rating('second-title', 'second-body');
 
-    resolve(JSON.stringify([first, second]));
+    resolve([first, second]);
 
     expect(await findRatingByTitle(first)).toBeInTheDocument();
     expect(await findRatingByBody(first)).toBeInTheDocument();
@@ -47,7 +54,7 @@ describe('Ratings component', () => {
   it('no ratings message', async () => {
     render(Ratings);
 
-    resolve(JSON.stringify([]));
+    resolve([]);
 
     expect(await findNoRatings()).toBeInTheDocument();
   });
@@ -57,7 +64,7 @@ describe('Ratings component', () => {
 
     expect(await findLoadingIndicator()).toBeInTheDocument();
 
-    resolve(JSON.stringify([]));
+    resolve([]);
 
     expect(await findNoRatings()).toBeInTheDocument();
   });
