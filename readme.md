@@ -29,6 +29,64 @@ can be enabled by running `dev` npm script.
 Currently using traditional MVC to render views and ApiController for api. Looks like `dotnet-aspnet-codegenerator` is
 not supported for F# so code scaffolding does not work.
 
+To make development easier have building client in separate build task in ``Wen.fsproj` file:
+
+```xml
+
+<Target Name="Rollup" BeforeTargets="Build">
+  <Exec Command="npm run build" WorkingDirectory="client" ConsoleToMSBuild="true" />
+</Target>
+```
+
+Also automatically client files as part of the project. This does not work so well in Rider because file order matters
+in F# projects so it would probably be easier to have client code separated from .Net project.
+
+```xml
+
+<ItemGroup Label="Client">
+  <Content Include="client\**\*.js" />
+  <Content Include="client\**\*.svelte" />
+  <Content Remove="client\node_modules\**" />
+</ItemGroup>
+```
+
+## Svelte & Rollup
+
+Rollup is used for transpiling and bundling client side code into js file which is server by Asp.Net.
+
+npm install --save-dev svelte rollup rollup-plugin-svelte @rollup/plugin-commonjs @rollup/plugin-node-resolve
+
+Create rollup configuration `rollup.config.js``:
+Build output is going to Asp.Net static wwwroot folder where we are serving bundled js.
+`plugin-node-resolve` and `plugin-commonjs` are used to bundle 3rd party libraries and modules which might be in ES6 or
+CommonJS syntax.
+
+```javascript
+import svelte from 'rollup-plugin-svelte';
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+
+export default {
+  input: 'src/main.js',
+  output: {
+    file: '../wwwroot/js/bundle.js',
+    format: 'iife',
+    name: 'app',
+  },
+  plugins: [
+    svelte({
+      include: 'src/**/*.svelte',
+      emitCss: false,
+      compilerOptions: {
+        customElement: false,
+      },
+    }),
+    commonjs(),
+    resolve({browser: true}),
+  ],
+};
+```
+
 ## Testing with Jest
 
 Jest test can be run `rollup-jest` rollup plugin.
