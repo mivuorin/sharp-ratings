@@ -14,10 +14,15 @@
   "author": "Mikko Vuorinen",
   "license": "MIT",
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^13.1.3",
+    "@babel/core": "^7.17.9",
+    "@babel/plugin-transform-runtime": "^7.17.0",
+    "@babel/preset-env": "^7.16.11",
+    "@rollup/plugin-commonjs": "^21.0.3",
+    "@rollup/plugin-node-resolve": "^13.2.0",
     "@testing-library/jest-dom": "^5.16.2",
     "@testing-library/svelte": "^3.1.0",
     "@testing-library/user-event": "^14.0.4",
+    "babel-jest": "^27.5.1",
     "eslint": "^8.12.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-jest": "^26.1.4",
@@ -30,12 +35,12 @@
     "prettier": "^2.6.2",
     "prettier-plugin-svelte": "^2.6.0",
     "rollup": "^2.70.0",
-    "rollup-jest": "^1.1.3",
     "rollup-plugin-svelte": "^7.1.0",
     "svelte": "^3.46.4",
     "svelte-jester": "^2.3.2"
   },
   "jest": {
+    "verbose": true,
     "automock": false,
     "resetMocks": true,
     "setupFiles": [
@@ -47,14 +52,7 @@
     ],
     "transform": {
       "^.+\\.svelte$": "svelte-jester",
-      "\\.m?js$": [
-        "rollup-jest",
-        {
-          "output": {
-            "sourcemap": true
-          }
-        }
-      ]
+      "^.+\\.jsx?$": "babel-jest"
     },
     "moduleFileExtensions": [
       "js",

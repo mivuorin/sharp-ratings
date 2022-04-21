@@ -1,17 +1,13 @@
 ﻿<script>
+  import { postRating } from './Api';
+
   let title = '';
   let body = '';
 
   async function submit() {
-    await fetch('/api/ratings', {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        title: title,
-        body: body,
-      }),
+    return await postRating({
+      title: title,
+      body: body,
     });
   }
 </script>

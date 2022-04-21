@@ -29,6 +29,64 @@ can be enabled by running `dev` npm script.
 Currently using traditional MVC to render views and ApiController for api. Looks like `dotnet-aspnet-codegenerator` is
 not supported for F# so code scaffolding does not work.
 
+To make development easier have building client in separate build task in ``Wen.fsproj` file:
+
+```xml
+
+<Target Name="Rollup" BeforeTargets="Build">
+  <Exec Command="npm run build" WorkingDirectory="client" ConsoleToMSBuild="true" />
+</Target>
+```
+
+Also automatically client files as part of the project. This does not work so well in Rider because file order matters
+in F# projects so it would probably be easier to have client code separated from .Net project.
+
+```xml
+
+<ItemGroup Label="Client">
+  <Content Include="client\**\*.js" />
+  <Content Include="client\**\*.svelte" />
+  <Content Remove="client\node_modules\**" />
+</ItemGroup>
+```
+
+## Svelte & Rollup
+
+Rollup is used for transpiling and bundling client side code into js file which is server by Asp.Net.
+
+npm install --save-dev svelte rollup rollup-plugin-svelte @rollup/plugin-commonjs @rollup/plugin-node-resolve
+
+Create rollup configuration `rollup.config.js``:
+Build output is going to Asp.Net static wwwroot folder where we are serving bundled js.
+`plugin-node-resolve` and `plugin-commonjs` are used to bundle 3rd party libraries and modules which might be in ES6 or
+CommonJS syntax.
+
+```javascript
+import svelte from 'rollup-plugin-svelte';
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+
+export default {
+  input: 'src/main.js',
+  output: {
+    file: '../wwwroot/js/bundle.js',
+    format: 'iife',
+    name: 'app',
+  },
+  plugins: [
+    svelte({
+      include: 'src/**/*.svelte',
+      emitCss: false,
+      compilerOptions: {
+        customElement: false,
+      },
+    }),
+    commonjs(),
+    resolve({browser: true}),
+  ],
+};
+```
+
 ## Testing with Jest
 
 Jest test can be run `rollup-jest` rollup plugin.
@@ -83,6 +141,42 @@ Configure jest to use dom matchers
 }
 ```
 
+### rollup-jest plugin caused jest mocks to fail in Svelte components
+
+For some reason Jest was not able to mock dependencies in Svelte components when it was transpiled with rollup-jest
+plugin. Mocks in normal ES6 modules worked fine. This might had something to do with how jest.mock calls needs to
+reorder imports or something.
+
+Solution to the problem was to switch from `jest-rollup` to `jest-babel`.
+
+npm install --save-dev @babel/core @babel/preset-env @babel/plugin-transform-runtime
+
+Babel 7 needs also `plugin-transform-runtime` to avoid `ReferenceError: regeneratorRuntime is not defined` error.
+
+Add following babel configuration `.babelrc` with env preset:
+
+```json
+{
+  "presets": [
+    "@babel/preset-env"
+  ],
+  "plugins": [
+    "@babel/plugin-transform-runtime"
+  ]
+}
+```
+
+Configure Jest to use `babel-jest` when transforming js files:
+
+```json
+{
+  "transform": {
+    "^.+\\.svelte$": "svelte-jester",
+    "^.+\\.jsx?$": "babel-jest"
+  }
+}
+```
+
 ## Mocking fetch
 
 Use [jest-fetch-mock](https://github.com/jefflau/jest-fetch-mock) to automatically mock fetch function.
@@ -99,7 +193,7 @@ It's better to make jest reset mocks after each test.
 Fetch mock needs to be initialized before loading jest environment, in `jest.setup.js`
 
 ```js
-    import fetchMock from "jest-fetch-mock";
+import fetchMock from "jest-fetch-mock";
 
 fetchMock.enableMocks();
 ```
@@ -299,6 +393,7 @@ Add .svelte component extension when running ESLint.
 # Reference links
 
 * Svelte docs - https://svelte.dev/docs
+* Svelte Recipes - https://svelte-recipes.netlify.app/
 * Rollup - https://rollupjs.org/guide/en/
 * Rollup plugin svelte - https://github.com/sveltejs/rollup-plugin-svelte
 * Rollup jest - https://github.com/ambar/rollup-jest
