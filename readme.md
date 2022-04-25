@@ -413,3 +413,6 @@ Add .svelte component extension when running ESLint.
   ignore
 * Make web api asynchronous https://docs.microsoft.com/en-us/aspnet/core/web-api/action-return-types?view=aspnetcore-6.0
 * Switch NUnit to XUnit which has better support for async tests https://github.com/xunit/xunit/issues/955
+* Notification bar component which would show errors/warnings/success messages.
+* Form validation
+* Animations

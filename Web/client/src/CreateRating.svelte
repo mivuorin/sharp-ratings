@@ -4,8 +4,10 @@
   let title = '';
   let body = '';
 
+  let promise = undefined;
+
   async function submit() {
-    return await postRating({
+    promise = postRating({
       title: title,
       body: body,
     });
@@ -21,3 +23,13 @@
 
   <input type="submit" value="Submit" />
 </form>
+
+{#if promise}
+  {#await promise}
+    <div>Loading...</div>
+  {:then _}
+    <div>Rating created successfully.</div>
+  {:catch _}
+    <div>Creating new rating failed!</div>
+  {/await}
+{/if}
