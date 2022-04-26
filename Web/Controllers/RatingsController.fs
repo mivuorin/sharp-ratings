@@ -2,11 +2,10 @@
 
 open System
 open System.Collections.Generic
+open System.ComponentModel.DataAnnotations
 open Microsoft.AspNetCore.Mvc
 open SharpRatings.Web
 open SharpRatings.Web.Database
-open Microsoft.EntityFrameworkCore
-open System.Linq
 
 type RatingsResponse =
     { Id: Guid
@@ -14,7 +13,10 @@ type RatingsResponse =
       Body: string }
 
 type CreateRatingRequest =
-    { Title: string
+    { [<Required>]
+      [<StringLength(140)>]
+      Title: string
+      [<Required>]
       Body: string }
 
 [<ApiController>]
@@ -35,10 +37,10 @@ type RatingsController(context: SharpRatingsDataContext) =
     [<HttpPost>]
     member _.Post(request: CreateRatingRequest) : ActionResult =
         let rating = Rating.create request.Title request.Body
-        
+
         context
-            |> Repository.add rating
-            |> Repository.save
-            |> ignore
-        
+        |> Repository.add rating
+        |> Repository.save
+        |> ignore
+
         OkResult()

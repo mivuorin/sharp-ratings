@@ -416,3 +416,4 @@ Add .svelte component extension when running ESLint.
 * Notification bar component which would show errors/warnings/success messages.
 * Form validation
 * Animations
+* Trim post request strings with attribute or something.
