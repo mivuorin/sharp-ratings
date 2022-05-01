@@ -1,5 +1,10 @@
 ﻿import * as api from '../src/Api';
-import { render, screen } from '@testing-library/svelte';
+import {
+  render,
+  screen,
+  waitFor,
+  waitForElementToBeRemoved,
+} from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 
 import CreateRating from '../src/CreateRating.svelte';
@@ -7,7 +12,7 @@ import { defer } from '../test/defer';
 
 jest.mock('../src/Api');
 
-describe('Create rating', () => {
+describe('CreateRating', () => {
   let postRatingMock;
   let reject;
   let resolve;
@@ -33,12 +38,14 @@ describe('Create rating', () => {
 
     resolve();
 
-    const expected = {
+    expect(
+      await screen.findByText('Rating created successfully.')
+    ).toBeInTheDocument();
+
+    expect(postRatingMock).toHaveBeenCalledWith({
       title: 'test-title',
       body: 'test-body',
-    };
-
-    expect(postRatingMock).toHaveBeenCalledWith(expected);
+    });
   });
 
   it('show error when post failed', async () => {
@@ -67,7 +74,7 @@ describe('Create rating', () => {
 
     await submit();
 
-    expect(queryErrorMessage()).not.toBeInTheDocument();
+    await waitForElementToBeRemoved(() => queryErrorMessage());
   });
 
   it('show loading indicator', async function () {
@@ -81,17 +88,59 @@ describe('Create rating', () => {
     resolve();
   });
 
-  it('show success message', async function () {
+  it('empty default values', async function () {
     render(CreateRating);
 
-    await fillForm();
-    await submit();
+    expect(await findTitle()).toHaveValue('');
+    expect(await findBody()).toHaveValue('');
+  });
 
-    resolve();
+  it('no initial errors are shown', function () {
+    render(CreateRating);
 
-    expect(
-      await screen.findByText('Rating created successfully.')
-    ).toBeInTheDocument();
+    expect(queryTitleIsRequiredError()).not.toBeInTheDocument();
+    expect(queryBodyIsRequiredError()).not.toBeInTheDocument();
+  });
+
+  it('title is required', async function () {
+    render(CreateRating);
+
+    const title = await findTitle();
+    title.focus();
+
+    (await findBody()).focus();
+
+    await waitFor(() => {
+      expect(queryTitleIsRequiredError()).toBeInTheDocument();
+    });
+  });
+
+  it('max title length', async function () {
+    render(CreateRating);
+
+    const title = await findTitle();
+    const text = 'x'.repeat(145);
+    await userEvent.type(title, text);
+
+    (await findBody()).focus();
+
+    await waitFor(() => {
+      expect(queryTitleIsTooLongError()).toBeInTheDocument();
+    });
+  });
+
+  it('body is required', async function () {
+    render(CreateRating);
+
+    const body = await findBody();
+    await body.focus();
+
+    const title = await findTitle();
+    title.focus();
+
+    await waitFor(() => {
+      expect(queryBodyIsRequiredError()).toBeInTheDocument();
+    });
   });
 });
 
@@ -108,12 +157,19 @@ async function submit() {
   await userEvent.click(submit);
 }
 
-async function fillForm() {
+async function setTitle(text) {
   const title = await findTitle();
-  await userEvent.type(title, 'test-title');
+  await userEvent.type(title, text);
+}
 
+async function setBody(text) {
   const body = await findBody();
-  await userEvent.type(body, 'test-body');
+  await userEvent.type(body, text);
+}
+
+async function fillForm() {
+  await setTitle('test-title');
+  await setBody('test-body');
 }
 
 async function findErrorMessage() {
@@ -122,4 +178,16 @@ async function findErrorMessage() {
 
 function queryErrorMessage() {
   return screen.queryByText('Creating new rating failed!');
+}
+
+function queryTitleIsRequiredError() {
+  return screen.queryByText('Please enter review title.');
+}
+
+function queryTitleIsTooLongError() {
+  return screen.queryByText('Please shorten title to fit into 140 characters.');
+}
+
+function queryBodyIsRequiredError() {
+  return screen.queryByText('Please enter review body text.');
 }

@@ -1,25 +1,53 @@
 ﻿<script>
   import { postRating } from './Api';
-
-  let title = '';
-  let body = '';
+  import { createForm } from 'svelte-forms-lib';
+  import * as yup from 'yup';
 
   let promise = undefined;
 
-  async function submit() {
-    promise = postRating({
-      title: title,
-      body: body,
-    });
-  }
+  const { form, errors, handleChange, handleSubmit } = createForm({
+    initialValues: {
+      title: '',
+      body: '',
+    },
+    validationSchema: yup.object({
+      title: yup
+        .string()
+        .required('Please enter review title.')
+        .max(140, 'Please shorten title to fit into ${max} characters.'),
+      body: yup.string().required('Please enter review body text.'),
+    }),
+    onSubmit: (values) => {
+      promise = postRating({ title: values.title, body: values.body });
+    },
+  });
 </script>
 
-<form on:submit|preventDefault={submit}>
+<form on:submit|preventDefault={handleSubmit}>
   <label for="create-rating-title">Tech name</label>
-  <input id="create-rating-title" type="text" bind:value={title} />
+  <input
+    id="create-rating-title"
+    type="text"
+    name="title"
+    on:change={handleChange}
+    on:blur={handleChange}
+    bind:value={$form.title}
+  />
+  {#if $errors.title}
+    <div>{$errors.title}</div>
+  {/if}
 
   <label for="create-rating-body">Review about tech?</label>
-  <textarea id="create-rating-body" bind:value={body} />
+  <textarea
+    id="create-rating-body"
+    name="body"
+    on:change={handleChange}
+    on:blur={handleChange}
+    bind:value={$form.body}
+  />
+  {#if $errors.body}
+    <div>{$errors.body}</div>
+  {/if}
 
   <input type="submit" value="Submit" />
 </form>

@@ -10,6 +10,8 @@ export default {
     name: 'app',
   },
   plugins: [
+    resolve({ browser: true }),
+    commonjs(),
     svelte({
       include: 'src/**/*.svelte',
       emitCss: false,
@@ -17,7 +19,5 @@ export default {
         customElement: false,
       },
     }),
-    commonjs(),
-    resolve({ browser: true }),
   ],
 };

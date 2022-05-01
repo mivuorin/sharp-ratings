@@ -74,6 +74,8 @@ export default {
     name: 'app',
   },
   plugins: [
+    commonjs(),
+    resolve({browser: true}),
     svelte({
       include: 'src/**/*.svelte',
       emitCss: false,
@@ -81,11 +83,11 @@ export default {
         customElement: false,
       },
     }),
-    commonjs(),
-    resolve({browser: true}),
   ],
 };
 ```
+
+> :warning: Make sure to add module resolver plugins before svelte plugin, otherwise importing dependencies won't work in Svelte components.
 
 ## Testing with Jest
 
@@ -390,6 +392,12 @@ Add .svelte component extension when running ESLint.
 
     eslint . --ext .js,.svelte
 
+## Form validation with svelte-form-lib and yup
+
+Svelte-form-lib provides nice abstraction for handling form state and it integrates with yup validation library.
+
+    npm install --save svelte-forms-lib yup
+
 # Reference links
 
 * Svelte docs - https://svelte.dev/docs
@@ -414,6 +422,6 @@ Add .svelte component extension when running ESLint.
 * Make web api asynchronous https://docs.microsoft.com/en-us/aspnet/core/web-api/action-return-types?view=aspnetcore-6.0
 * Switch NUnit to XUnit which has better support for async tests https://github.com/xunit/xunit/issues/955
 * Notification bar component which would show errors/warnings/success messages.
-* Form validation
 * Animations
 * Trim post request strings with attribute or something.
+* Separate client side form validation from component to make it easier to test.
