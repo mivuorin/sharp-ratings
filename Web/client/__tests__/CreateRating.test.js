@@ -102,6 +102,12 @@ describe('CreateRating', () => {
     expect(queryBodyIsRequiredError()).not.toBeInTheDocument();
   });
 
+  it('initial focus should be in title field', async function () {
+    render(CreateRating);
+
+    expect(await findTitle()).toHaveFocus();
+  });
+
   it('title is required', async function () {
     render(CreateRating);
 

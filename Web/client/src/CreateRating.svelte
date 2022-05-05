@@ -1,8 +1,10 @@
 ﻿<script>
+  import { onMount } from 'svelte';
   import { postRating } from './Api';
   import { createForm } from 'svelte-forms-lib';
   import * as yup from 'yup';
 
+  let titleInput;
   let promise = undefined;
 
   const { form, errors, handleChange, handleSubmit } = createForm({
@@ -21,6 +23,8 @@
       promise = postRating({ title: values.title, body: values.body });
     },
   });
+
+  onMount(() => titleInput.focus());
 </script>
 
 <form on:submit|preventDefault={handleSubmit}>
@@ -29,6 +33,7 @@
     id="create-rating-title"
     type="text"
     name="title"
+    bind:this={titleInput}
     on:change={handleChange}
     on:blur={handleChange}
     bind:value={$form.title}
