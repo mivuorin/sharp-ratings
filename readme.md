@@ -75,9 +75,8 @@ export default {
   },
   plugins: [
     commonjs(),
-    resolve({browser: true}),
+    resolve({ browser: true }),
     svelte({
-      include: 'src/**/*.svelte',
       emitCss: false,
       compilerOptions: {
         customElement: false,
@@ -88,6 +87,8 @@ export default {
 ```
 
 > :warning: Make sure to add module resolver plugins before svelte plugin, otherwise importing dependencies won't work in Svelte components.
+
+> :warning: Svelte plugins `include` option is explicit, if you set it and do not also add `node_modules` folder then imported .svelte components are not transpiled.
 
 ## Testing with Jest
 
@@ -398,6 +399,36 @@ Svelte-form-lib provides nice abstraction for handling form state and it integra
 
     npm install --save svelte-forms-lib yup
 
+## Svelte Material UI
+
+[Svelte Material UI](https://sveltematerialui.com/) is Svelte implementation of Googles CSS framework. SMUI library
+components are split in separate npm packages to decrease project bundle size.
+
+Each component needs to be individually added into project. eg.
+
+    npm install --save-dev @smui/button
+    npm install --save-dev @smui/top-app-bar
+    ...
+
+Material UI comes with them support and separate theme builder.
+
+    npm install --save smui-theme
+
+Create default theme from template.
+
+    npx smui-theme template src/theme 
+
+This theme needs to be compiled every time component is added or removed, so good place to add is as `prepare` npm script.
+
+```json
+{
+  "scripts": {
+    "dev": "rollup -c -w",
+    "prepare": "smui-theme compile ../wwwroot/smui.css -i src/theme"
+  }
+}
+```
+
 # Reference links
 
 * Svelte docs - https://svelte.dev/docs
@@ -425,3 +456,4 @@ Svelte-form-lib provides nice abstraction for handling form state and it integra
 * Animations
 * Trim post request strings with attribute or something.
 * Separate client side form validation from component to make it easier to test.
+* Move create rating into separate view.
