@@ -76,3 +76,9 @@ module RatingsControllerTest =
         actual.Body |> should equal request.Body
 
         deleteDatabase context
+
+    [<Test>]
+    let Is_api_controller () =
+        Attribute.IsDefined(typeof<RatingsController>, typeof<ApiControllerAttribute>)
+        |> should equal true
+

@@ -59,5 +59,9 @@
       "svelte"
     ],
     "testEnvironment": "jsdom"
+  },
+  "dependencies": {
+    "svelte-forms-lib": "^2.0.1",
+    "yup": "^0.32.11"
   }
 }
