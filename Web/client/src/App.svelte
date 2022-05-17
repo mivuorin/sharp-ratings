@@ -23,7 +23,6 @@
 <AutoAdjust {topAppBar}>
   <main>
     <Ratings />
-    <hr />
     <CreateRating />
   </main>
 </AutoAdjust>

@@ -464,10 +464,6 @@ Add following to `jest.config.js`
 * Svelte preprocessor for using other languages than JS - https://github.com/sveltejs/svelte-preprocess
 
 # TODO List
-
-* Move building client out from asp.net web project build to speed up building. No need to build client when building
-  backend for tests.
-* Move jest configuration to separate config file from packages.config to make things cleaner
 * Figure out why Rider shows solution view shows multiple duplicate folders eg. client and src.
 * Use generators for generating test data
 * Wrap dbcontext into repository which would offer more functional api, so that method calls would not be needed to
@@ -479,3 +475,7 @@ Add following to `jest.config.js`
 * Trim post request strings with attribute or something.
 * Separate client side form validation from component to make it easier to test.
 * Move create rating into separate view.
+* Find some fix for Riders autoformat bug in svelte components. Maybe config issue?
+* Add Svelte Material UI Typography to project.
+* Add SMUI character counter helper to create rating form.
+* Use explicit version of SMUI instead of *

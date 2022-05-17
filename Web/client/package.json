@@ -22,6 +22,7 @@
     "@rollup/plugin-node-resolve": "^13.2.0",
     "@smui/button": "*",
     "@smui/paper": "*",
+    "@smui/textfield": "*",
     "@smui/top-app-bar": "*",
     "@testing-library/jest-dom": "^5.16.2",
     "@testing-library/svelte": "^3.1.0",

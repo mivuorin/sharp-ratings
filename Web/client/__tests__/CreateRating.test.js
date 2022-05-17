@@ -60,7 +60,7 @@ describe('CreateRating', () => {
     expect(error).toBeInTheDocument();
   });
 
-  it('hide error message when submitting again', async function () {
+  it('hide error message when submitting again', async () => {
     render(CreateRating);
 
     await fillForm();
@@ -77,7 +77,7 @@ describe('CreateRating', () => {
     await waitForElementToBeRemoved(() => queryErrorMessage());
   });
 
-  it('show loading indicator', async function () {
+  it('show loading indicator', async () => {
     render(CreateRating);
 
     await fillForm();
@@ -88,61 +88,74 @@ describe('CreateRating', () => {
     resolve();
   });
 
-  it('empty default values', async function () {
+  it('empty default values', async () => {
     render(CreateRating);
 
     expect(await findTitle()).toHaveValue('');
     expect(await findBody()).toHaveValue('');
   });
 
-  it('no initial errors are shown', function () {
+  it('no initial errors are shown', () => {
     render(CreateRating);
 
     expect(queryTitleIsRequiredError()).not.toBeInTheDocument();
     expect(queryBodyIsRequiredError()).not.toBeInTheDocument();
   });
 
-  it('initial focus should be in title field', async function () {
+  it('initial focus should be in title field', async () => {
     render(CreateRating);
 
     expect(await findTitle()).toHaveFocus();
   });
 
-  it('title is required', async function () {
+  it('initial title description helper text', async () => {
     render(CreateRating);
 
-    const title = await findTitle();
-    title.focus();
+    const description = await screen.findByText(
+      'Name of the tech. Should fit in 140 chars.'
+    );
 
-    (await findBody()).focus();
+    expect(description).toBeInTheDocument();
+  });
+
+  it('initial body description helper text', async () => {
+    render(CreateRating);
+
+    const description = await screen.findByText(
+      'Explain why tech in question is good or bad?'
+    );
+
+    expect(description).toBeInTheDocument();
+  });
+
+  it('title is required', async () => {
+    render(CreateRating);
+
+    await submit();
 
     await waitFor(() => {
       expect(queryTitleIsRequiredError()).toBeInTheDocument();
     });
   });
 
-  it('max title length', async function () {
+  it('max title length', async () => {
     render(CreateRating);
 
     const title = await findTitle();
     const text = 'x'.repeat(145);
     await userEvent.type(title, text);
 
-    (await findBody()).focus();
+    await submit();
 
     await waitFor(() => {
       expect(queryTitleIsTooLongError()).toBeInTheDocument();
     });
   });
 
-  it('body is required', async function () {
+  it('body is required', async () => {
     render(CreateRating);
 
-    const body = await findBody();
-    await body.focus();
-
-    const title = await findTitle();
-    title.focus();
+    await submit();
 
     await waitFor(() => {
       expect(queryBodyIsRequiredError()).toBeInTheDocument();

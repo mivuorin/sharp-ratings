@@ -12,6 +12,7 @@ module.exports = {
     '^.+\\.svelte$': 'svelte-jester',
     '^.+\\.jsx?$': 'babel-jest',
   },
+  // TODO Might be needed for handling SMUI css styles?
   //moduleNameMapper: { '^.+\\.(css|less|scss)$': 'babel-jest' },
   transformIgnorePatterns: ['node_modules/(?!(@smui|@material))'],
   moduleFileExtensions: ['js', 'jsm', 'svelte'],
