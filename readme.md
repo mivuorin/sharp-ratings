@@ -429,6 +429,8 @@ This theme needs to be compiled every time component is added or removed, so goo
 }
 ```
 
+
+//      "^.+\\.(css|less|scss)$": "babel-jest"
 # Reference links
 
 * Svelte docs - https://svelte.dev/docs

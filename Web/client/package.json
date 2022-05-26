@@ -45,27 +45,6 @@
     "svelte-jester": "^2.3.2",
     "svelte-preprocess": "^4.10.6"
   },
-  "jest": {
-    "verbose": true,
-    "automock": false,
-    "resetMocks": true,
-    "setupFiles": [
-      "./jest.setup.js"
-    ],
-    "setupFilesAfterEnv": [
-      "./jest.setupAfterEnv.js",
-      "@testing-library/jest-dom/extend-expect"
-    ],
-    "transform": {
-      "^.+\\.svelte$": "svelte-jester",
-      "^.+\\.jsx?$": "babel-jest"
-    },
-    "moduleFileExtensions": [
-      "js",
-      "svelte"
-    ],
-    "testEnvironment": "jsdom"
-  },
   "dependencies": {
     "svelte-forms-lib": "^2.0.1",
     "yup": "^0.32.11"
