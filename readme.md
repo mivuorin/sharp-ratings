@@ -6,33 +6,45 @@ Learning project for Svelte and Asp.Net Core powered by F#.
 
 * .Net 6 / Asp.Net Core / Svelte / Node
 
-## How to build:
+## TLDR: How to build & run
 
 Svelte client needs to be built before building asp.net app. All client code is in `client` folder and build result will
 be located in `wwwroot` folder where asp.net is serving it. To manually build client:
 
-    cd client
+    cd Web/client
     npm install
     npm run build
 
-Building client is automatically done in MsBuilds before build target.
+After building client build web app and run it:
 
-## How to dev:
+    cd Web
+    dotnet run
 
-Asp.net pages are compiled at runtime so no need to restart server. Svelte supports hot reloading in watch mode which
-can be enabled by running `dev` npm script.
+## Better development experience with watch mode:
 
-    client/npm run dev
+Rollup supports watch mode which can be enabled by running `dev` npm script. Every time client files change rollup
+builds client again.
+
+    cd Web/client
+    npm run dev
+
+Asp.net can also be run in watch mode which allows to monitor changes in wwwroot files by default.
+
+    cd Web
+    dotnet watch
+
+Now it's possible to a certain limit, to edit client and server code without restarting server.
 
 ## Asp.Net Core MVC + F#
 
 Currently using traditional MVC to render views and ApiController for api. Looks like `dotnet-aspnet-codegenerator` is
 not supported for F# so code scaffolding does not work.
 
-To make development easier have building client in separate build task in ``Wen.fsproj` file:
+To make building client and server easier it's possible to build client in separate build task in ``Wen.fsproj` file.
+Note that this builds client every time server needs to be build and can make build times longer. It's better to build
+client and server separately from each other which makes running them in watch mode easier.
 
 ```xml
-
 <Target Name="Rollup" BeforeTargets="Build">
   <Exec Command="npm run build" WorkingDirectory="client" ConsoleToMSBuild="true" />
 </Target>
@@ -42,7 +54,6 @@ Also automatically client files as part of the project. This does not work so we
 in F# projects so it would probably be easier to have client code separated from .Net project.
 
 ```xml
-
 <ItemGroup Label="Client">
   <Content Include="client\**\*.js" />
   <Content Include="client\**\*.svelte" />
@@ -156,18 +167,18 @@ npm install --save-dev @babel/core @babel/preset-env @babel/plugin-transform-run
 
 Babel 7 needs also `plugin-transform-runtime` to avoid `ReferenceError: regeneratorRuntime is not defined` error.
 
-Add following babel configuration `.babelrc` with env preset:
+Add following babel configuration ~~.babelrc~~  `babel.json.js` with env preset:
 
-```json
-{
-  "presets": [
-    "@babel/preset-env"
-  ],
-  "plugins": [
-    "@babel/plugin-transform-runtime"
-  ]
-}
+```javascript
+module.exports = {
+  presets: ["@babel/preset-env"],
+  plugins: ["@babel/plugin-transform-runtime"]
+};
 ```
+
+> :warning: **`.babelrc` config file somehow breaks Jests `transformIgnorePatterns` configuration !!!**
+> Use `babel.config.js` instead. https://github.com/svelteness/svelte-jester/issues/4
+
 
 Configure Jest to use `babel-jest` when transforming js files:
 
@@ -418,7 +429,8 @@ Create default theme from template.
 
     npx smui-theme template src/theme 
 
-This theme needs to be compiled every time component is added or removed, so good place to add is as `prepare` npm script.
+This theme needs to be compiled every time component is added or removed, so good place to add is as `prepare` npm
+script.
 
 ```json
 {
@@ -429,8 +441,16 @@ This theme needs to be compiled every time component is added or removed, so goo
 }
 ```
 
+Because Svelte Material UI components needs to be transpiled with other code Jest needs to be configured to also include
+those modules. By default Jest does not transpile modules under `node_modules`.
 
-//      "^.+\\.(css|less|scss)$": "babel-jest"
+Add following to `jest.config.js`
+
+```javascript
+  transformIgnorePatterns: ['node_modules/(?!(@smui|@material))']
+```
+
+
 # Reference links
 
 * Svelte docs - https://svelte.dev/docs
