@@ -1,4 +1,9 @@
 ﻿<script>
+  import Paper from '@smui/paper';
+  import Textfield from '@smui/textfield';
+  import HelperText from '@smui/textfield/helper-text';
+  import Button, { Label } from '@smui/button';
+
   import { onMount } from 'svelte';
   import { postRating } from './Api';
   import { createForm } from 'svelte-forms-lib';
@@ -27,42 +32,55 @@
   onMount(() => titleInput.focus());
 </script>
 
-<form on:submit|preventDefault={handleSubmit}>
-  <label for="create-rating-title">Tech name</label>
-  <input
-    id="create-rating-title"
-    type="text"
-    name="title"
-    bind:this={titleInput}
-    on:change={handleChange}
-    on:blur={handleChange}
-    bind:value={$form.title}
-  />
-  {#if $errors.title}
-    <div>{$errors.title}</div>
+<Paper>
+  <form on:submit|preventDefault={handleSubmit}>
+    <Textfield
+      label="Tech name"
+      input$name="title"
+      bind:this={titleInput}
+      bind:value={$form.title}
+      bind:invalid={$errors.title}
+      on:change={handleChange}
+      on:blur={handleChange}
+    >
+      <HelperText validationMsg={$errors.title} slot="helper">
+        {#if $errors.title}
+          {$errors.title}
+        {:else}
+          Name of the tech. Should fit in 140 chars.
+        {/if}
+      </HelperText>
+    </Textfield>
+    <Textfield
+      label="Review about tech?"
+      input$name="body"
+      textarea
+      bind:value={$form.body}
+      bind:invalid={$errors.body}
+      on:change={handleChange}
+      on:blur={handleChange}
+    >
+      <HelperText validationMsg={$errors.body} slot="helper">
+        {#if $errors.body}
+          {$errors.body}
+        {:else}
+          Explain why tech in question is good or bad?
+        {/if}
+      </HelperText>
+    </Textfield>
+
+    <Button variant="raised">
+      <Label>Submit</Label>
+    </Button>
+  </form>
+
+  {#if promise}
+    {#await promise}
+      <div>Loading...</div>
+    {:then _}
+      <div>Rating created successfully.</div>
+    {:catch _}
+      <div>Creating new rating failed!</div>
+    {/await}
   {/if}
-
-  <label for="create-rating-body">Review about tech?</label>
-  <textarea
-    id="create-rating-body"
-    name="body"
-    on:change={handleChange}
-    on:blur={handleChange}
-    bind:value={$form.body}
-  />
-  {#if $errors.body}
-    <div>{$errors.body}</div>
-  {/if}
-
-  <input type="submit" value="Submit" />
-</form>
-
-{#if promise}
-  {#await promise}
-    <div>Loading...</div>
-  {:then _}
-    <div>Rating created successfully.</div>
-  {:catch _}
-    <div>Creating new rating failed!</div>
-  {/await}
-{/if}
+</Paper>

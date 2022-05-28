@@ -6,33 +6,45 @@ Learning project for Svelte and Asp.Net Core powered by F#.
 
 * .Net 6 / Asp.Net Core / Svelte / Node
 
-## How to build:
+## TLDR: How to build & run
 
 Svelte client needs to be built before building asp.net app. All client code is in `client` folder and build result will
 be located in `wwwroot` folder where asp.net is serving it. To manually build client:
 
-    cd client
+    cd Web/client
     npm install
     npm run build
 
-Building client is automatically done in MsBuilds before build target.
+After building client build web app and run it:
 
-## How to dev:
+    cd Web
+    dotnet run
 
-Asp.net pages are compiled at runtime so no need to restart server. Svelte supports hot reloading in watch mode which
-can be enabled by running `dev` npm script.
+## Better development experience with watch mode:
 
-    client/npm run dev
+Rollup supports watch mode which can be enabled by running `dev` npm script. Every time client files change rollup
+builds client again.
+
+    cd Web/client
+    npm run dev
+
+Asp.net can also be run in watch mode which allows to monitor changes in wwwroot files by default.
+
+    cd Web
+    dotnet watch
+
+Now it's possible to a certain limit, to edit client and server code without restarting server.
 
 ## Asp.Net Core MVC + F#
 
 Currently using traditional MVC to render views and ApiController for api. Looks like `dotnet-aspnet-codegenerator` is
 not supported for F# so code scaffolding does not work.
 
-To make development easier have building client in separate build task in ``Wen.fsproj` file:
+To make building client and server easier it's possible to build client in separate build task in ``Wen.fsproj` file.
+Note that this builds client every time server needs to be build and can make build times longer. It's better to build
+client and server separately from each other which makes running them in watch mode easier.
 
 ```xml
-
 <Target Name="Rollup" BeforeTargets="Build">
   <Exec Command="npm run build" WorkingDirectory="client" ConsoleToMSBuild="true" />
 </Target>
@@ -42,7 +54,6 @@ Also automatically client files as part of the project. This does not work so we
 in F# projects so it would probably be easier to have client code separated from .Net project.
 
 ```xml
-
 <ItemGroup Label="Client">
   <Content Include="client\**\*.js" />
   <Content Include="client\**\*.svelte" />
@@ -75,9 +86,8 @@ export default {
   },
   plugins: [
     commonjs(),
-    resolve({browser: true}),
+    resolve({ browser: true }),
     svelte({
-      include: 'src/**/*.svelte',
       emitCss: false,
       compilerOptions: {
         customElement: false,
@@ -88,6 +98,8 @@ export default {
 ```
 
 > :warning: Make sure to add module resolver plugins before svelte plugin, otherwise importing dependencies won't work in Svelte components.
+
+> :warning: Svelte plugins `include` option is explicit, if you set it and do not also add `node_modules` folder then imported .svelte components are not transpiled.
 
 ## Testing with Jest
 
@@ -155,18 +167,18 @@ npm install --save-dev @babel/core @babel/preset-env @babel/plugin-transform-run
 
 Babel 7 needs also `plugin-transform-runtime` to avoid `ReferenceError: regeneratorRuntime is not defined` error.
 
-Add following babel configuration `.babelrc` with env preset:
+Add following babel configuration ~~.babelrc~~  `babel.json.js` with env preset:
 
-```json
-{
-  "presets": [
-    "@babel/preset-env"
-  ],
-  "plugins": [
-    "@babel/plugin-transform-runtime"
-  ]
-}
+```javascript
+module.exports = {
+  presets: ["@babel/preset-env"],
+  plugins: ["@babel/plugin-transform-runtime"]
+};
 ```
+
+> :warning: **`.babelrc` config file somehow breaks Jests `transformIgnorePatterns` configuration !!!**
+> Use `babel.config.js` instead. https://github.com/svelteness/svelte-jester/issues/4
+
 
 Configure Jest to use `babel-jest` when transforming js files:
 
@@ -398,6 +410,47 @@ Svelte-form-lib provides nice abstraction for handling form state and it integra
 
     npm install --save svelte-forms-lib yup
 
+## Svelte Material UI
+
+[Svelte Material UI](https://sveltematerialui.com/) is Svelte implementation of Googles CSS framework. SMUI library
+components are split in separate npm packages to decrease project bundle size.
+
+Each component needs to be individually added into project. eg.
+
+    npm install --save-dev @smui/button
+    npm install --save-dev @smui/top-app-bar
+    ...
+
+Material UI comes with them support and separate theme builder.
+
+    npm install --save smui-theme
+
+Create default theme from template.
+
+    npx smui-theme template src/theme 
+
+This theme needs to be compiled every time component is added or removed, so good place to add is as `prepare` npm
+script.
+
+```json
+{
+  "scripts": {
+    "dev": "rollup -c -w",
+    "prepare": "smui-theme compile ../wwwroot/smui.css -i src/theme"
+  }
+}
+```
+
+Because Svelte Material UI components needs to be transpiled with other code Jest needs to be configured to also include
+those modules. By default Jest does not transpile modules under `node_modules`.
+
+Add following to `jest.config.js`
+
+```javascript
+  transformIgnorePatterns: ['node_modules/(?!(@smui|@material))']
+```
+
+
 # Reference links
 
 * Svelte docs - https://svelte.dev/docs
@@ -411,10 +464,6 @@ Svelte-form-lib provides nice abstraction for handling form state and it integra
 * Svelte preprocessor for using other languages than JS - https://github.com/sveltejs/svelte-preprocess
 
 # TODO List
-
-* Move building client out from asp.net web project build to speed up building. No need to build client when building
-  backend for tests.
-* Move jest configuration to separate config file from packages.config to make things cleaner
 * Figure out why Rider shows solution view shows multiple duplicate folders eg. client and src.
 * Use generators for generating test data
 * Wrap dbcontext into repository which would offer more functional api, so that method calls would not be needed to
@@ -425,3 +474,8 @@ Svelte-form-lib provides nice abstraction for handling form state and it integra
 * Animations
 * Trim post request strings with attribute or something.
 * Separate client side form validation from component to make it easier to test.
+* Move create rating into separate view.
+* Find some fix for Riders autoformat bug in svelte components. Maybe config issue?
+* Add Svelte Material UI Typography to project.
+* Add SMUI character counter helper to create rating form.
+* Use explicit version of SMUI instead of *
